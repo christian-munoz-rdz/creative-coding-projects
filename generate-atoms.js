@@ -19,9 +19,12 @@ class Atom {
         this.x = x;
         this.y = y;
         this.radius = Math.random() * 8 + 2;
+        this.originalRadius = this.radius; // Store original radius
         this.speedX = Math.random() * 4 - 2; // -2 < speedX < 2
         this.speedY = Math.random() * 4 - 2; // -2 < speedY < 2
         this.magneticPullFactor = 0.05; // Strength of magnetic pull
+        this.lifespan = Math.random() * 1000 + 500; // Random lifespan between 500-1500 frames
+        this.age = 0; // Current age of the atom
     }
 
     update() {
@@ -56,6 +59,19 @@ class Atom {
         }
         if (this.y < 0 || this.y > canvas.height) {
             this.speedY *= -1;
+        }
+    }
+
+    updateSize() {
+        // Increment age
+        this.age++;
+        
+        // Only start reducing size after 70% of lifespan has passed
+        if (this.age > this.lifespan * 0.7) {
+            // Calculate how much of the remaining lifespan has passed (0 to 1)
+            const remainingLifeRatio = (this.age - this.lifespan * 0.7) / (this.lifespan * 0.3);
+            // Gradually reduce size based on remaining life
+            this.radius = this.originalRadius * (1 - remainingLifeRatio * 0.9);
         }
     }
 
@@ -138,10 +154,14 @@ const animate = () => {
         ctx.arc(mouse.x, mouse.y, 100, 0, Math.PI * 2);
         ctx.fill();
     }
-    
-    atoms.forEach(atom => {
+
+    atoms.forEach((atom, index) => {
         atom.draw();
         atom.update();
+        atom.updateSize();
+        if (atom.age > atom.lifespan) {
+            atoms.splice(index, 1); // Remove atoms that have exceeded their lifespan
+        }
     });
     requestAnimationFrame(animate);
 };
