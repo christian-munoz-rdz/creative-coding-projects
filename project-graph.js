@@ -1,0 +1,466 @@
+// Clase para crear y administrar el grafo de proyectos
+class ProjectGraph {
+    constructor(canvasId, projects) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.projects = projects;
+        this.nodes = [];
+        this.edges = [];
+        this.hoveredNode = null;
+        this.selectedNode = null;
+        this.nodeInfo = document.querySelector('.node-info');
+        this.animationId = null;
+        this.transitionActive = false;
+        
+        // Configuración
+        this.nodeRadius = 40;
+        this.edgeStrength = 0.08;
+        this.repulsionStrength = 10000;
+        this.centerAttraction = 0.000005;
+        this.damping = 0.85;
+        
+        this.init();
+    }
+    
+    init() {
+        this.resizeCanvas();
+        this.setupNodes();
+        this.setupEdges();
+        this.setupEventListeners();
+        this.animate();
+    }
+    
+    resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+    
+    setupNodes() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.3;
+        
+        this.projects.forEach((project, index) => {
+            // Posición en círculo con un poco de aleatoriedad
+            const angle = (index / this.projects.length) * Math.PI * 2;
+            const x = centerX + Math.cos(angle) * radius * (0.8 + Math.random() * 0.4);
+            const y = centerY + Math.sin(angle) * radius * (0.8 + Math.random() * 0.4);
+            
+            this.nodes.push({
+                id: index,
+                x: x,
+                y: y,
+                vx: 0,
+                vy: 0,
+                radius: this.nodeRadius,
+                color: this.getRandomColor(),
+                project: project
+            });
+        });
+    }
+    
+    setupEdges() {
+        // Crear conexiones entre nodos
+        for (let i = 0; i < this.nodes.length; i++) {
+            // Conectar con los 2-3 nodos más cercanos
+            const connections = 2 + Math.floor(Math.random() * 2);
+            
+            // Array de distancias a otros nodos
+            const distances = [];
+            for (let j = 0; j < this.nodes.length; j++) {
+                if (i !== j) {
+                    const dx = this.nodes[i].x - this.nodes[j].x;
+                    const dy = this.nodes[i].y - this.nodes[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    distances.push({ index: j, distance: distance });
+                }
+            }
+            
+            // Ordenar por distancia y tomar los más cercanos
+            distances.sort((a, b) => a.distance - b.distance);
+            for (let k = 0; k < Math.min(connections, distances.length); k++) {
+                const j = distances[k].index;
+                // Evitar duplicados (solo agregar si i < j)
+                if (i < j) {
+                    this.edges.push({
+                        source: i,
+                        target: j,
+                        strength: this.edgeStrength,
+                        length: this.canvas.width * 0.15,
+                        color: 'rgba(0, 255, 255, 0.4)'
+                    });
+                }
+            }
+        }
+        
+        // Asegurar que todos los nodos están conectados
+        for (let i = 0; i < this.nodes.length - 1; i++) {
+            const connected = this.edges.some(edge => 
+                (edge.source === i && edge.target === i + 1) || 
+                (edge.source === i + 1 && edge.target === i)
+            );
+            
+            if (!connected) {
+                this.edges.push({
+                    source: i,
+                    target: i + 1,
+                    strength: this.edgeStrength,
+                    length: this.canvas.width * 0.15,
+                    color: 'rgba(0, 255, 255, 0.4)'
+                });
+            }
+        }
+    }
+    
+    setupEventListeners() {
+        this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.canvas.addEventListener('click', this.handleClick.bind(this));
+        window.addEventListener('resize', () => {
+            this.resizeCanvas();
+        });
+    }
+    
+    handleMouseMove(event) {
+        const rect = this.canvas.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+        
+        // Verificar si el cursor está sobre algún nodo
+        let hoveredNode = null;
+        for (const node of this.nodes) {
+            const distance = Math.sqrt(
+                Math.pow(mouseX - node.x, 2) + 
+                Math.pow(mouseY - node.y, 2)
+            );
+            
+            if (distance < node.radius) {
+                hoveredNode = node;
+                break;
+            }
+        }
+        
+        // Actualizar cursor y mostrar info si hay nodo bajo el cursor
+        if (hoveredNode) {
+            this.canvas.style.cursor = 'pointer';
+            this.showNodeInfo(hoveredNode, event.clientX, event.clientY);
+        } else {
+            this.canvas.style.cursor = 'default';
+            this.hideNodeInfo();
+        }
+        
+        this.hoveredNode = hoveredNode;
+    }
+    
+    handleClick(event) {
+        if (this.hoveredNode && !this.transitionActive) {
+            this.selectedNode = this.hoveredNode;
+            this.transitionToProject(this.selectedNode.project.url);
+        }
+    }
+    
+    showNodeInfo(node, x, y) {
+        const project = node.project;
+        this.nodeInfo.innerHTML = `
+            <strong>${project.title}</strong>
+            <p>${project.description}</p>
+        `;
+        
+        this.nodeInfo.style.display = 'block';
+        // Posicionar el cuadro de información cerca del cursor
+        const infoWidth = this.nodeInfo.offsetWidth;
+        const infoHeight = this.nodeInfo.offsetHeight;
+        
+        // Ajustar posición para que no se salga de la ventana
+        let posX = x + 15;
+        let posY = y + 15;
+        
+        if (posX + infoWidth > window.innerWidth) {
+            posX = x - infoWidth - 15;
+        }
+        
+        if (posY + infoHeight > window.innerHeight) {
+            posY = y - infoHeight - 15;
+        }
+        
+        this.nodeInfo.style.left = posX + 'px';
+        this.nodeInfo.style.top = posY + 'px';
+    }
+    
+    hideNodeInfo() {
+        this.nodeInfo.style.display = 'none';
+    }
+    
+    transitionToProject(url) {
+        this.transitionActive = true;
+        const transition = document.querySelector('.page-transition');
+        
+        // Activar transición
+        transition.classList.add('active');
+        
+        // Navegar a la página después de la transición
+        setTimeout(() => {
+            window.location.href = url;
+        }, 600);
+    }
+    
+    update() {
+        // Aplicar fuerzas para posicionar los nodos
+        for (let i = 0; i < this.nodes.length; i++) {
+            const node = this.nodes[i];
+            
+            // Resetear aceleración
+            let fx = 0;
+            let fy = 0;
+            
+            // Fuerza de repulsión entre nodos
+            for (let j = 0; j < this.nodes.length; j++) {
+                if (i !== j) {
+                    const other = this.nodes[j];
+                    const dx = node.x - other.x;
+                    const dy = node.y - other.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance > 0) {
+                        // Fuerza inversamente proporcional al cuadrado de la distancia
+                        const force = this.repulsionStrength / (distance * distance);
+                        fx += (dx / distance) * force;
+                        fy += (dy / distance) * force;
+                    }
+                }
+            }
+            
+            // Fuerza de atracción para las conexiones
+            for (const edge of this.edges) {
+                let source, target;
+                
+                if (edge.source === i) {
+                    source = node;
+                    target = this.nodes[edge.target];
+                } else if (edge.target === i) {
+                    source = node;
+                    target = this.nodes[edge.source];
+                } else {
+                    continue;
+                }
+                
+                const dx = source.x - target.x;
+                const dy = source.y - target.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 0) {
+                    // Fuerza basada en la ley de Hooke (resorte)
+                    const force = (distance - edge.length) * edge.strength;
+                    fx -= (dx / distance) * force;
+                    fy -= (dy / distance) * force;
+                }
+            }
+            
+            // Fuerza de atracción hacia el centro
+            const centerX = this.canvas.width / 2;
+            const centerY = this.canvas.height / 2;
+            const dx = node.x - centerX;
+            const dy = node.y - centerY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Fuerza proporcional a la distancia al centro
+            fx -= dx * distance * this.centerAttraction;
+            fy -= dy * distance * this.centerAttraction;
+            
+            // Aplicar aceleración con amortiguación
+            node.vx = node.vx * this.damping + fx;
+            node.vy = node.vy * this.damping + fy;
+            
+            // Actualizar posición
+            node.x += node.vx;
+            node.y += node.vy;
+            
+            // Limitar posición dentro del canvas con margen
+            const margin = node.radius;
+            if (node.x < margin) node.x = margin;
+            if (node.x > this.canvas.width - margin) node.x = this.canvas.width - margin;
+            if (node.y < margin) node.y = margin;
+            if (node.y > this.canvas.height - margin) node.y = this.canvas.height - margin;
+        }
+    }
+    
+    draw() {
+        // Limpiar canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Dibujar conexiones
+        this.drawEdges();
+        
+        // Dibujar nodos
+        this.drawNodes();
+    }
+    
+    drawEdges() {
+        for (const edge of this.edges) {
+            const source = this.nodes[edge.source];
+            const target = this.nodes[edge.target];
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(source.x, source.y);
+            this.ctx.lineTo(target.x, target.y);
+            this.ctx.strokeStyle = edge.color;
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+        }
+    }
+    
+    drawNodes() {
+        for (const node of this.nodes) {
+            // Dibujar círculo
+            this.ctx.beginPath();
+            this.ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            
+            // Estilo según estado
+            if (node === this.hoveredNode) {
+                // Estilo cuando el cursor está encima
+                this.ctx.fillStyle = this.lightenColor(node.color, 0.3);
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = node.color;
+            } else {
+                // Estilo normal
+                this.ctx.fillStyle = node.color;
+                this.ctx.shadowBlur = 0;
+            }
+            
+            this.ctx.fill();
+            
+            // Borde del nodo
+            this.ctx.strokeStyle = '#fff';
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+            
+            // Dibujar icono o inicial del proyecto en el nodo
+            this.ctx.fillStyle = '#fff';
+            this.ctx.font = 'bold 16px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            const initial = node.project.title.charAt(0);
+            this.ctx.fillText(initial, node.x, node.y);
+        }
+    }
+    
+    animate() {
+        this.update();
+        this.draw();
+        this.animationId = requestAnimationFrame(this.animate.bind(this));
+    }
+    
+    getRandomColor() {
+        // Generar colores en tonos azul-cian
+        const h = 180 + Math.random() * 40; // Tonos entre azul y cian
+        const s = 70 + Math.random() * 30;  // Saturación alta
+        const l = 40 + Math.random() * 20;  // Luminosidad media
+        
+        return `hsl(${h}, ${s}%, ${l}%)`;
+    }
+    
+    lightenColor(color, amount) {
+        // Función para aclarar un color HSL
+        const hsl = /hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)/g.exec(color);
+        if (hsl) {
+            const h = parseInt(hsl[1]);
+            const s = parseFloat(hsl[2]);
+            const l = Math.min(100, parseFloat(hsl[3]) + amount * 100);
+            return `hsl(${h}, ${s}%, ${l}%)`;
+        }
+        return color;
+    }
+}
+
+// Inicializar la página cuando se carga
+document.addEventListener('DOMContentLoaded', () => {
+    // Definir proyectos
+    const projects = [
+        {
+            title: 'Audio Visualizer',
+            description: 'Visualizador de audio interactivo que responde a la música',
+            url: 'project-audio-visualizer.html',
+            jsFile: 'audio-visualizer.js'
+        },
+        {
+            title: 'Forma Semi-Orgánica',
+            description: 'Forma orgánica generativa que evoluciona con el tiempo',
+            url: 'project-semi-organic-shape.html',
+            jsFile: 'semi-organic-shape.js'
+        },
+        {
+            title: 'Parallax Form',
+            description: 'Formulario 3D con efecto parallax',
+            url: 'project-parallax-form.html',
+            jsFile: 'parallax-form.js'
+        },
+        {
+            title: 'Teseracto',
+            description: 'Visualización 4D de un teseracto (hipercubo)',
+            url: 'project-teseract.html',
+            jsFile: 'teseract.js'
+        },
+        {
+            title: 'Cubo Interactivo',
+            description: 'Cubo 3D interactivo con efectos de iluminación',
+            url: 'project-interactive-cube.html',
+            jsFile: 'interactive-cube.js'
+        },
+        {
+            title: 'Partículas Interactivas',
+            description: 'Sistema de partículas que responde al movimiento del cursor',
+            url: 'project-interactive-particles.html',
+            jsFile: 'interactive-particles.js'
+        },
+        {
+            title: 'Generador de Átomos',
+            description: 'Simulación de estructuras atómicas en movimiento',
+            url: 'project-generate-atoms.html',
+            jsFile: 'generate-atoms.js'
+        },
+        {
+            title: 'Efecto Píxel',
+            description: 'Efecto de pixelación dinámica para imágenes',
+            url: 'project-pixel-effect.html',
+            jsFile: 'pixel-effect.js'
+        },
+        {
+            title: 'Efecto Rama',
+            description: 'Simulación de crecimiento orgánico tipo ramificación',
+            url: 'project-branch-effect.html',
+            jsFile: 'branch-effect.js'
+        },
+        {
+            title: 'Triángulo de Sierpinski',
+            description: 'Visualización fractal del triángulo de Sierpinski',
+            url: 'project-sierpinski-triangle.html',
+            jsFile: 'sierpinski-triangle.js'
+        }
+    ];
+    
+    // Crear el grafo de proyectos
+    const graph = new ProjectGraph('graph-canvas', projects);
+    
+    // Gestionar transición de entrada en la página
+    const transition = document.querySelector('.page-transition');
+    if (transition) {
+        transition.classList.add('active');
+        setTimeout(() => {
+            transition.classList.remove('active');
+        }, 100);
+    }
+});
+
+// Función para realizar transición de página
+function navigateTo(url) {
+    const transition = document.querySelector('.page-transition');
+    
+    // Activar transición
+    transition.classList.add('active');
+    
+    // Navegar a la página después de la transición
+    setTimeout(() => {
+        window.location.href = url;
+    }, 600);
+    
+    return false; // Evitar comportamiento predeterminado del enlace
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forma Semi-Orgánica</title>
+    <link rel="stylesheet" href="graph.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            background: radial-gradient(circle at center, #111 0%, #000 70%);
+        }
+        canvas {
+            display: block;
+        }
+        .project-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .project-title, .back-button {
+            z-index: 5;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="project-container">
+        <h1 class="project-title">Forma Semi-Orgánica</h1>
+        
+        <!-- Botón de volver -->
+        <a href="homepage.html" class="back-button" onclick="return navigateTo('homepage.html')">
+            <span>&larr;</span>
+        </a>
+        
+        <!-- Nota: Three.js crea su propio canvas -->
+    </div>
+    
+    <!-- Elemento para la transición de página -->
+    <div class="page-transition"></div>
+    
+    <!-- Three.js es necesario para este proyecto -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Script del proyecto -->
+    <script src="semi-organic-shape.js"></script>
+    
+    <!-- Script para navegación con transición -->
+    <script>
+        // Función para realizar transición de página
+        function navigateTo(url) {
+            const transition = document.querySelector('.page-transition');
+            
+            // Activar transición
+            transition.classList.add('active');
+            
+            // Navegar a la página después de la transición
+            setTimeout(() => {
+                window.location.href = url;
+            }, 600);
+            
+            return false; // Evitar comportamiento predeterminado del enlace
+        }
+        
+        // Gestionar transición de entrada en la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const transition = document.querySelector('.page-transition');
+            transition.classList.add('active');
+            setTimeout(() => {
+                transition.classList.remove('active');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

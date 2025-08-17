@@ -2,7 +2,7 @@ const canvas = document.getElementById('my-canvas');
 const ctx = canvas.getContext('2d');
 
 const img = new Image();
-img.src = './valorant.png'; // Replace with your image path
+img.src = './assets/vanishing-point.jpg'; // Replace with your image path
 
 let brightnessArray = [];
 let particlesArray = [];
@@ -52,7 +52,7 @@ img.onload = () => {
         rgbArray.push(`rgb(${red},${green},${blue})`);
     }
 
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 40000; i++) {
         particlesArray.push(new Particle());
     }
 

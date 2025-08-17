@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Coding Projects</title>
+    <link rel="stylesheet" href="graph.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: radial-gradient(circle at center, #111 0%, #000 70%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Creative Coding Projects</h1>
+        
+        <canvas id="graph-canvas"></canvas>
+        
+        <div class="node-info"></div>
+        
+        <div class="footer">
+            <p>Haz clic en cualquier nodo para explorar el proyecto</p>
+        </div>
+    </div>
+    
+    <!-- Elemento para la transición de página -->
+    <div class="page-transition"></div>
+    
+    <!-- Script del grafo -->
+    <script src="project-graph.js"></script>
+</body>
+</html>

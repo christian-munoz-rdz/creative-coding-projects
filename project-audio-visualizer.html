@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Visualizer</title>
+    <link rel="stylesheet" href="graph.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            background: radial-gradient(circle at center, #111 0%, #000 70%);
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="project-container">
+        <h1 class="project-title">Audio Visualizer</h1>
+        
+        <!-- Botón de volver -->
+        <a href="homepage.html" class="back-button" onclick="return navigateTo('homepage.html')">
+            <span>&larr;</span>
+        </a>
+        
+        <canvas id="my-canvas"></canvas>
+    </div>
+    
+    <!-- Elemento para la transición de página -->
+    <div class="page-transition"></div>
+    
+    <!-- Script del proyecto -->
+    <script src="audio-visualizer.js"></script>
+    
+    <!-- Script para navegación con transición -->
+    <script>
+        // Función para realizar transición de página
+        function navigateTo(url) {
+            const transition = document.querySelector('.page-transition');
+            
+            // Activar transición
+            transition.classList.add('active');
+            
+            // Navegar a la página después de la transición
+            setTimeout(() => {
+                window.location.href = url;
+            }, 600);
+            
+            return false; // Evitar comportamiento predeterminado del enlace
+        }
+        
+        // Gestionar transición de entrada en la página
+        document.addEventListener('DOMContentLoaded', () => {
+            const transition = document.querySelector('.page-transition');
+            transition.classList.add('active');
+            setTimeout(() => {
+                transition.classList.remove('active');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
