@@ -11,13 +11,16 @@ class ProjectGraph {
         this.nodeInfo = document.querySelector('.node-info');
         this.animationId = null;
         this.transitionActive = false;
+        this.time = 0;
         
         // Configuración
         this.nodeRadius = 25;
-        this.edgeStrength = 0.05;
-        this.repulsionStrength = 8000;
-        this.centerAttraction = 0.000003;
-        this.damping = 0.85;
+        this.edgeStrength = 0.03;
+        this.repulsionStrength = 5000;
+        this.centerAttraction = 0.000002;
+        this.damping = 0.75;
+        this.continousMovement = true; // Habilitar movimiento continuo
+        this.hoverTolerance = 5; // Mayor tolerancia para la detección de hover
         
         this.init();
     }
@@ -27,18 +30,48 @@ class ProjectGraph {
         this.setupNodes();
         this.setupEdges();
         this.setupEventListeners();
+        
+        // Añadir movimiento inicial a los nodos para que empiecen a moverse
+        for (const node of this.nodes) {
+            node.vx = (Math.random() - 0.5) * 2; // Velocidad inicial aleatoria
+            node.vy = (Math.random() - 0.5) * 2;
+        }
+        
         this.animate();
     }
     
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        
+        // Ajustar las posiciones de los nodos cuando se redimensiona
+        if (this.nodes.length > 0) {
+            const centerX = this.canvas.width / 2;
+            const centerY = this.canvas.height / 2;
+            
+            // Calculamos el centro anterior
+            let oldCenterX = 0, oldCenterY = 0;
+            for (const node of this.nodes) {
+                oldCenterX += node.x;
+                oldCenterY += node.y;
+            }
+            oldCenterX /= this.nodes.length;
+            oldCenterY /= this.nodes.length;
+            
+            // Ajustamos las posiciones relativas al nuevo centro
+            for (const node of this.nodes) {
+                const dx = node.x - oldCenterX;
+                const dy = node.y - oldCenterY;
+                node.x = centerX + dx;
+                node.y = centerY + dy;
+            }
+        }
     }
     
     setupNodes() {
         const centerX = this.canvas.width / 2;
         const centerY = this.canvas.height / 2;
-        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.3;
+        const radius = Math.min(this.canvas.width, this.canvas.height) * 0.35; // Aumentado para usar más espacio
         
         this.projects.forEach((project, index) => {
             // Posición en círculo con un poco de aleatoriedad
@@ -153,15 +186,20 @@ class ProjectGraph {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
         
-        // Verificar si el cursor está sobre algún nodo
+        // Verificar si el cursor está sobre algún nodo con mayor tolerancia para rectangulos
         let hoveredNode = null;
         for (const node of this.nodes) {
-            const distance = Math.sqrt(
-                Math.pow(mouseX - node.x, 2) + 
-                Math.pow(mouseY - node.y, 2)
-            );
+            // Calcular las dimensiones del rectángulo del nodo
+            const width = node.radius * 3.5;
+            const height = node.radius * 1.5;
             
-            if (distance < node.radius) {
+            // Verificar si el cursor está dentro del rectángulo del nodo con tolerancia adicional
+            if (
+                mouseX >= node.x - width/2 - this.hoverTolerance && 
+                mouseX <= node.x + width/2 + this.hoverTolerance && 
+                mouseY >= node.y - height/2 - this.hoverTolerance && 
+                mouseY <= node.y + height/2 + this.hoverTolerance
+            ) {
                 hoveredNode = node;
                 break;
             }
@@ -232,6 +270,9 @@ class ProjectGraph {
     }
     
     update() {
+        // Incrementar contador de tiempo para el movimiento continuo
+        this.time += 0.01;
+        
         // Aplicar fuerzas para posicionar los nodos
         for (let i = 0; i < this.nodes.length; i++) {
             const node = this.nodes[i];
@@ -239,6 +280,21 @@ class ProjectGraph {
             // Resetear aceleración
             let fx = 0;
             let fy = 0;
+            
+            // Añadir movimiento continuo sutil
+            if (this.continousMovement) {
+                // Movimiento ondulatorio único para cada nodo basado en su posición inicial
+                const nodeId = i;
+                const phaseX = this.time + nodeId * 0.3;
+                const phaseY = this.time + nodeId * 0.5;
+                
+                // Fuerzas de movimiento continuo (más sutiles)
+                const continuousFx = Math.sin(phaseX) * 0.1;
+                const continuousFy = Math.cos(phaseY) * 0.1;
+                
+                fx += continuousFx;
+                fy += continuousFy;
+            }
             
             // Fuerza de repulsión entre nodos
             for (let j = 0; j < this.nodes.length; j++) {
@@ -303,11 +359,23 @@ class ProjectGraph {
             node.y += node.vy;
             
             // Limitar posición dentro del canvas con margen
-            const margin = node.radius;
-            if (node.x < margin) node.x = margin;
-            if (node.x > this.canvas.width - margin) node.x = this.canvas.width - margin;
-            if (node.y < margin) node.y = margin;
-            if (node.y > this.canvas.height - margin) node.y = this.canvas.height - margin;
+            const margin = node.radius * 2;
+            if (node.x < margin) {
+                node.x = margin;
+                node.vx *= -0.5; // Rebote suave
+            }
+            if (node.x > this.canvas.width - margin) {
+                node.x = this.canvas.width - margin;
+                node.vx *= -0.5; // Rebote suave
+            }
+            if (node.y < margin) {
+                node.y = margin;
+                node.vy *= -0.5; // Rebote suave
+            }
+            if (node.y > this.canvas.height - margin) {
+                node.y = this.canvas.height - margin;
+                node.vy *= -0.5; // Rebote suave
+            }
         }
     }
     
@@ -323,6 +391,7 @@ class ProjectGraph {
     }
     
     drawEdges() {
+        // Primero, dibujar todas las conexiones normales
         for (const edge of this.edges) {
             const source = this.nodes[edge.source];
             const target = this.nodes[edge.target];
@@ -330,30 +399,64 @@ class ProjectGraph {
             this.ctx.beginPath();
             this.ctx.moveTo(source.x, source.y);
             this.ctx.lineTo(target.x, target.y);
-            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
             this.ctx.lineWidth = 1;
             this.ctx.stroke();
+        }
+        
+        // Luego, resaltar las conexiones relacionadas con el nodo sobre el que está el cursor
+        if (this.hoveredNode) {
+            for (const edge of this.edges) {
+                if (edge.source === this.hoveredNode.id || edge.target === this.hoveredNode.id) {
+                    const source = this.nodes[edge.source];
+                    const target = this.nodes[edge.target];
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(source.x, source.y);
+                    this.ctx.lineTo(target.x, target.y);
+                    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                    this.ctx.lineWidth = 1.5;
+                    this.ctx.stroke();
+                }
+            }
         }
     }
     
     drawNodes() {
+        // Dibujar nodos
         for (const node of this.nodes) {
-            // Dibujar rectángulo redondeado
-            this.ctx.beginPath();
+            // Calcular dimensiones
             const width = node.radius * 3.5;
             const height = node.radius * 1.5;
-            this.roundRect(this.ctx, node.x - width/2, node.y - height/2, width, height, 5);
+            const x = node.x - width/2;
+            const y = node.y - height/2;
+            const cornerRadius = 5;
             
-            // Estilo según estado
+            // Dibujar sombra para todos los nodos
+            this.ctx.save();
+            if (node === this.hoveredNode) {
+                this.ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 0;
+            } else {
+                this.ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                this.ctx.shadowBlur = 8;
+                this.ctx.shadowOffsetX = 0;
+                this.ctx.shadowOffsetY = 2;
+            }
+            
+            // Dibujar rectángulo redondeado
+            this.ctx.beginPath();
+            this.roundRect(this.ctx, x, y, width, height, cornerRadius);
+            
+            // Aplicar estilo según estado
             if (node === this.hoveredNode) {
                 // Estilo cuando el cursor está encima
-                this.ctx.fillStyle = '#333';
-                this.ctx.shadowBlur = 15;
-                this.ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+                this.ctx.fillStyle = '#444';
             } else {
-                // Estilo normal
+                // Estilo normal - más oscuro y sólido como en la imagen
                 this.ctx.fillStyle = '#222';
-                this.ctx.shadowBlur = 0;
             }
             
             this.ctx.fill();
@@ -362,24 +465,38 @@ class ProjectGraph {
             this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
             this.ctx.lineWidth = 1;
             this.ctx.stroke();
+            this.ctx.restore();
             
             // Dibujar nombre del proyecto en el nodo
             this.ctx.fillStyle = '#fff';
-            this.ctx.font = '14px Roboto';
+            this.ctx.font = '13px Roboto';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             
-            // Usar nombre corto o abreviación según el espacio
-            let displayText = node.project.title;
-            if (displayText.length > 10) {
-                displayText = displayText.split(' ')[0];
-                if (displayText.length > 10) {
-                    displayText = displayText.substring(0, 8) + '...';
-                }
-            }
-            
+            // Usar nombre corto - simplificado para que se parezca a la imagen
+            // Convertir nombre de proyecto a nombres cortos como en la imagen de referencia
+            let displayText = this.getShortName(node.project.title);
             this.ctx.fillText(displayText, node.x, node.y);
         }
+    }
+    
+    // Función para obtener un nombre corto para los nodos
+    getShortName(fullTitle) {
+        // Mapeo de nombres según la imagen de referencia
+        const nameMap = {
+            'Audio Visualizer': 'Audio',
+            'Forma Semi-Orgánica': 'Forma',
+            'Parallax Form': 'Parallax',
+            'Teseracto': 'Teseracto',
+            'Cubo Interactivo': 'Cubo',
+            'Partículas Interactivas': 'Partículas',
+            'Generador de Átomos': 'Generador',
+            'Efecto Píxel': 'Efecto',
+            'Efecto Rama': 'Efecto',
+            'Triángulo de Sierpinski': 'Triángulo'
+        };
+        
+        return nameMap[fullTitle] || fullTitle.split(' ')[0];
     }
     
     // Función auxiliar para dibujar rectángulos redondeados
