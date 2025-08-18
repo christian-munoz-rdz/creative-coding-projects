@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Delusional Gallery</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* Canvas para partículas */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        /* Contenedor principal */
+        .about-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+        
+        /* Navegación */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .logo:hover {
+            color: #00ffff;
+        }
+        
+        .navbar-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .navbar-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar-links a:hover {
+            color: #00ffff;
+        }
+        
+        /* Contenido principal */
+        .about-content {
+            max-width: 800px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.1);
+        }
+        
+        .about-title {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .about-description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: #e0e0e0;
+        }
+        
+        .github-link {
+            display: inline-block;
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border: 2px solid #00ffff;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .github-link:hover {
+            background: #00ffff;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        /* Animación de fade-in */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .about-content {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            .about-title {
+                font-size: 2rem;
+            }
+            
+            .about-description {
+                font-size: 1rem;
+            }
+            
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .navbar-links {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas para partículas luminiscentes -->
+    <canvas id="particles-canvas"></canvas>
+    
+    <!-- Navegación -->
+    <nav class="navbar">
+        <a href="homepage.html" class="logo">DG Inc.</a>
+        <div class="navbar-links">
+            <a href="homepage.html">Home</a>
+            <a href="about.html">About</a>
+        </div>
+    </nav>
+    
+    <!-- Contenedor principal -->
+    <div class="about-container">
+        <div class="about-content">
+            <h1 class="about-title">About</h1>
+            <p class="about-description">
+                This is a collection of creative coding experiments. 
+                You can check the source code of the effects at:
+            </p>
+            <a href="#" class="github-link">GitHub Repository</a>
+        </div>
+    </div>
+    
+    <script>
+        // Sistema de partículas luminiscentes
+        class ParticleSystem {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.particleCount = 100;
+                
+                this.resize();
+                this.createParticles();
+                this.animate();
+                
+                window.addEventListener('resize', () => this.resize());
+            }
+            
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            createParticles() {
+                for (let i = 0; i < this.particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 3 + 1,
+                        opacity: Math.random() * 0.8 + 0.2,
+                        hue: Math.random() * 60 + 180 // Azul a cyan
+                    });
+                }
+            }
+            
+            updateParticles() {
+                this.particles.forEach(particle => {
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    
+                    // Respawn en los bordes
+                    if (particle.x < 0) particle.x = this.canvas.width;
+                    if (particle.x > this.canvas.width) particle.x = 0;
+                    if (particle.y < 0) particle.y = this.canvas.height;
+                    if (particle.y > this.canvas.height) particle.y = 0;
+                    
+                    // Variación de opacidad
+                    particle.opacity += (Math.random() - 0.5) * 0.02;
+                    particle.opacity = Math.max(0.1, Math.min(1, particle.opacity));
+                });
+            }
+            
+            drawParticles() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.particles.forEach(particle => {
+                    this.ctx.beginPath();
+                    
+                    // Gradiente radial para efecto luminoso
+                    const gradient = this.ctx.createRadialGradient(
+                        particle.x, particle.y, 0,
+                        particle.x, particle.y, particle.size * 3
+                    );
+                    gradient.addColorStop(0, `hsla(${particle.hue}, 70%, 60%, ${particle.opacity})`);
+                    gradient.addColorStop(1, `hsla(${particle.hue}, 70%, 60%, 0)`);
+                    
+                    this.ctx.fillStyle = gradient;
+                    this.ctx.arc(particle.x, particle.y, particle.size * 3, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    
+                    // Núcleo brillante
+                    this.ctx.beginPath();
+                    this.ctx.fillStyle = `hsla(${particle.hue}, 100%, 80%, ${particle.opacity})`;
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+            }
+            
+            drawConnections() {
+                this.particles.forEach((particle, i) => {
+                    this.particles.slice(i + 1).forEach(otherParticle => {
+                        const dx = particle.x - otherParticle.x;
+                        const dy = particle.y - otherParticle.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < 150) {
+                            const opacity = (150 - distance) / 150 * 0.3;
+                            this.ctx.beginPath();
+                            this.ctx.strokeStyle = `rgba(0, 255, 255, ${opacity})`;
+                            this.ctx.lineWidth = 1;
+                            this.ctx.moveTo(particle.x, particle.y);
+                            this.ctx.lineTo(otherParticle.x, otherParticle.y);
+                            this.ctx.stroke();
+                        }
+                    });
+                });
+            }
+            
+            animate() {
+                this.updateParticles();
+                this.drawParticles();
+                this.drawConnections();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Inicializar sistema de partículas
+        const canvas = document.getElementById('particles-canvas');
+        new ParticleSystem(canvas);
+        
+        // Efectos de interacción con el mouse
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            // Crear partículas temporales en la posición del mouse
+            if (Math.random() < 0.1) {
+                const tempParticle = document.createElement('div');
+                tempParticle.style.position = 'fixed';
+                tempParticle.style.left = mouseX + 'px';
+                tempParticle.style.top = mouseY + 'px';
+                tempParticle.style.width = '4px';
+                tempParticle.style.height = '4px';
+                tempParticle.style.background = 'radial-gradient(circle, rgba(0,255,255,0.8) 0%, transparent 70%)';
+                tempParticle.style.borderRadius = '50%';
+                tempParticle.style.pointerEvents = 'none';
+                tempParticle.style.zIndex = '5';
+                tempParticle.style.animation = 'fadeOut 1s ease-out forwards';
+                
+                document.body.appendChild(tempParticle);
+                
+                setTimeout(() => {
+                    document.body.removeChild(tempParticle);
+                }, 1000);
+            }
+        });
+        
+        // CSS para la animación de fadeOut
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                0% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
