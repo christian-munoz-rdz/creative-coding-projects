@@ -548,62 +548,62 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             title: 'Audio Visualizer',
             description: 'Visualizador de audio interactivo que responde a la música',
-            url: 'project-audio-visualizer.html',
-            jsFile: 'audio-visualizer.js'
+            url: 'pages/project-audio-visualizer.html',
+            jsFile: 'scripts/audio-visualizer.js'
         },
         {
             title: 'Forma Semi-Orgánica',
             description: 'Forma orgánica generativa que evoluciona con el tiempo',
-            url: 'project-semi-organic-shape.html',
-            jsFile: 'semi-organic-shape.js'
+            url: 'pages/project-semi-organic-shape.html',
+            jsFile: 'scripts/semi-organic-shape.js'
         },
         {
             title: 'Parallax Form',
             description: 'Formulario 3D con efecto parallax',
-            url: 'project-parallax-form.html',
-            jsFile: 'parallax-form.js'
+            url: 'pages/project-parallax-form.html',
+            jsFile: 'scripts/parallax-form.js'
         },
         {
             title: 'Teseracto',
             description: 'Visualización 4D de un teseracto (hipercubo)',
-            url: 'project-teseract.html',
-            jsFile: 'teseract.js'
+            url: 'pages/project-teseract.html',
+            jsFile: 'scripts/teseract.js'
         },
         {
             title: 'Cubo Interactivo',
             description: 'Cubo 3D interactivo con efectos de iluminación',
-            url: 'project-interactive-cube.html',
-            jsFile: 'interactive-cube.js'
+            url: 'pages/project-interactive-cube.html',
+            jsFile: 'scripts/interactive-cube.js'
         },
         {
             title: 'Partículas Interactivas',
             description: 'Sistema de partículas que responde al movimiento del cursor',
-            url: 'project-interactive-particles.html',
-            jsFile: 'interactive-particles.js'
+            url: 'pages/project-interactive-particles.html',
+            jsFile: 'scripts/interactive-particles.js'
         },
         {
             title: 'Generador de Átomos',
             description: 'Simulación de estructuras atómicas en movimiento',
-            url: 'project-generate-atoms.html',
-            jsFile: 'generate-atoms.js'
+            url: 'pages/project-generate-atoms.html',
+            jsFile: 'scripts/generate-atoms.js'
         },
         {
             title: 'Efecto Píxel',
             description: 'Efecto de pixelación dinámica para imágenes',
-            url: 'project-pixel-effect.html',
-            jsFile: 'pixel-effect.js'
+            url: 'pages/project-pixel-effect.html',
+            jsFile: 'scripts/pixel-effect.js'
         },
         {
             title: 'Efecto Rama',
             description: 'Simulación de crecimiento orgánico tipo ramificación',
-            url: 'project-branch-effect.html',
-            jsFile: 'branch-effect.js'
+            url: 'pages/project-branch-effect.html',
+            jsFile: 'scripts/branch-effect.js'
         },
         {
             title: 'Triángulo de Sierpinski',
             description: 'Visualización fractal del triángulo de Sierpinski',
-            url: 'project-sierpinski-triangle.html',
-            jsFile: 'sierpinski-triangle.js'
+            url: 'pages/project-sierpinski-triangle.html',
+            jsFile: 'scripts/sierpinski-triangle.js'
         }
     ];
     

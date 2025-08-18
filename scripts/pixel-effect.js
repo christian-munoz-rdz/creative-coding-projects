@@ -2,7 +2,7 @@ const canvas = document.getElementById('my-canvas');
 const ctx = canvas.getContext('2d');
 
 const img = new Image();
-img.src = './assets/vanishing-point.jpg'; // Replace with your image path
+img.src = '../assets/images/vanishing-point.jpg'; // Replace with your image path
 
 let brightnessArray = [];
 let particlesArray = [];

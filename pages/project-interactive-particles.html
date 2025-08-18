@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forma Semi-Orgánica</title>
-    <link rel="stylesheet" href="graph.css">
-    <link rel="stylesheet" href="styles.css">
+    <title>Partículas Interactivas</title>
+    <link rel="stylesheet" href="../assets/styles/graph.css">
+    <link rel="stylesheet" href="../assets/styles/styles.css">
     <style>
         body {
             margin: 0;
@@ -16,38 +16,25 @@
         canvas {
             display: block;
         }
-        .project-container canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        .project-title, .back-button {
-            z-index: 5;
-            position: relative;
-        }
     </style>
 </head>
 <body>
     <div class="project-container">
-        <h1 class="project-title">Forma Semi-Orgánica</h1>
+        <h1 class="project-title">Partículas Interactivas</h1>
         
         <!-- Botón de volver -->
-        <a href="index.html" class="back-button" onclick="return navigateTo('index.html')">
+        <a href="../index.html" class="back-button" onclick="return navigateTo('../index.html')">
             <span>&larr;</span>
         </a>
         
-        <!-- Nota: Three.js crea su propio canvas -->
+        <canvas id="my-canvas"></canvas>
     </div>
     
     <!-- Elemento para la transición de página -->
     <div class="page-transition"></div>
     
-    <!-- Three.js es necesario para este proyecto -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
     <!-- Script del proyecto -->
-    <script src="semi-organic-shape.js"></script>
+    <script src="../scripts/interactive-particles.js"></script>
     
     <!-- Script para navegación con transición -->
     <script>
