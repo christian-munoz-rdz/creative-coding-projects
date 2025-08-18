@@ -4,7 +4,7 @@ body {
     padding: 0;
     overflow: hidden;
     background-color: #000;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', 'Arial', sans-serif;
     color: #fff;
 }
 
@@ -12,6 +12,12 @@ body {
     position: relative;
     width: 100vw;
     height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
 }
 
 /* Estilos para el canvas del grafo */
@@ -25,17 +31,52 @@ body {
 }
 
 /* Título principal */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #111;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: 10;
+}
+
+.navbar .logo {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar-links {
+    display: flex;
+}
+
+.navbar-links a {
+    margin-left: 30px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: opacity 0.3s ease;
+}
+
+.navbar-links a:hover {
+    opacity: 0.7;
+}
+
 .title {
     position: absolute;
-    top: 30px;
+    top: 80px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     text-align: center;
     color: #fff;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
     z-index: 2;
+    display: none; /* Ocultar ya que usamos el navbar */
 }
 
 /* Información sobre cada nodo cuando se pasa el ratón */
@@ -43,15 +84,15 @@ body {
     position: absolute;
     display: none;
     padding: 10px 15px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(0, 255, 255, 0.5);
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 5px;
     color: #fff;
     font-size: 0.9rem;
     pointer-events: none;
     z-index: 3;
     max-width: 250px;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
 /* Animación de página */
@@ -74,13 +115,28 @@ body {
 /* Footer con información */
 .footer {
     position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.9rem;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.6);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px 30px;
+    background-color: #111;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     z-index: 2;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer .footer-right {
+    width: 200px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Botón de volver a la homepage en las páginas de proyectos */

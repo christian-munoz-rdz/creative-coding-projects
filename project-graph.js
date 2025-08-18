@@ -13,10 +13,10 @@ class ProjectGraph {
         this.transitionActive = false;
         
         // Configuración
-        this.nodeRadius = 40;
-        this.edgeStrength = 0.08;
-        this.repulsionStrength = 10000;
-        this.centerAttraction = 0.000005;
+        this.nodeRadius = 25;
+        this.edgeStrength = 0.05;
+        this.repulsionStrength = 8000;
+        this.centerAttraction = 0.000003;
         this.damping = 0.85;
         
         this.init();
@@ -60,10 +60,10 @@ class ProjectGraph {
     }
     
     setupEdges() {
-        // Crear conexiones entre nodos
+        // Crear una red más densa de conexiones entre nodos (similar a la imagen)
         for (let i = 0; i < this.nodes.length; i++) {
-            // Conectar con los 2-3 nodos más cercanos
-            const connections = 2 + Math.floor(Math.random() * 2);
+            // Conectar con más nodos para crear una red densa
+            const connections = 4 + Math.floor(Math.random() * 3); // 4-6 conexiones por nodo
             
             // Array de distancias a otros nodos
             const distances = [];
@@ -86,8 +86,8 @@ class ProjectGraph {
                         source: i,
                         target: j,
                         strength: this.edgeStrength,
-                        length: this.canvas.width * 0.15,
-                        color: 'rgba(0, 255, 255, 0.4)'
+                        length: this.canvas.width * 0.13,
+                        color: 'rgba(255, 255, 255, 0.2)'
                     });
                 }
             }
@@ -105,8 +105,36 @@ class ProjectGraph {
                     source: i,
                     target: i + 1,
                     strength: this.edgeStrength,
+                    length: this.canvas.width * 0.13,
+                    color: 'rgba(255, 255, 255, 0.2)'
+                });
+            }
+        }
+        
+        // Añadir algunas conexiones adicionales aleatorias para una red más densa
+        const extraConnections = Math.floor(this.nodes.length * 0.5);
+        for (let i = 0; i < extraConnections; i++) {
+            const source = Math.floor(Math.random() * this.nodes.length);
+            let target = Math.floor(Math.random() * this.nodes.length);
+            
+            // Asegurar que no sea el mismo nodo
+            while (source === target) {
+                target = Math.floor(Math.random() * this.nodes.length);
+            }
+            
+            // Verificar que esta conexión no exista ya
+            const connectionExists = this.edges.some(edge => 
+                (edge.source === source && edge.target === target) || 
+                (edge.source === target && edge.target === source)
+            );
+            
+            if (!connectionExists) {
+                this.edges.push({
+                    source: Math.min(source, target),
+                    target: Math.max(source, target),
+                    strength: this.edgeStrength,
                     length: this.canvas.width * 0.15,
-                    color: 'rgba(0, 255, 255, 0.4)'
+                    color: 'rgba(255, 255, 255, 0.2)'
                 });
             }
         }
@@ -302,45 +330,70 @@ class ProjectGraph {
             this.ctx.beginPath();
             this.ctx.moveTo(source.x, source.y);
             this.ctx.lineTo(target.x, target.y);
-            this.ctx.strokeStyle = edge.color;
-            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            this.ctx.lineWidth = 1;
             this.ctx.stroke();
         }
     }
     
     drawNodes() {
         for (const node of this.nodes) {
-            // Dibujar círculo
+            // Dibujar rectángulo redondeado
             this.ctx.beginPath();
-            this.ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+            const width = node.radius * 3.5;
+            const height = node.radius * 1.5;
+            this.roundRect(this.ctx, node.x - width/2, node.y - height/2, width, height, 5);
             
             // Estilo según estado
             if (node === this.hoveredNode) {
                 // Estilo cuando el cursor está encima
-                this.ctx.fillStyle = this.lightenColor(node.color, 0.3);
+                this.ctx.fillStyle = '#333';
                 this.ctx.shadowBlur = 15;
-                this.ctx.shadowColor = node.color;
+                this.ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
             } else {
                 // Estilo normal
-                this.ctx.fillStyle = node.color;
+                this.ctx.fillStyle = '#222';
                 this.ctx.shadowBlur = 0;
             }
             
             this.ctx.fill();
             
             // Borde del nodo
-            this.ctx.strokeStyle = '#fff';
-            this.ctx.lineWidth = 2;
+            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            this.ctx.lineWidth = 1;
             this.ctx.stroke();
             
-            // Dibujar icono o inicial del proyecto en el nodo
+            // Dibujar nombre del proyecto en el nodo
             this.ctx.fillStyle = '#fff';
-            this.ctx.font = 'bold 16px Arial';
+            this.ctx.font = '14px Roboto';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
-            const initial = node.project.title.charAt(0);
-            this.ctx.fillText(initial, node.x, node.y);
+            
+            // Usar nombre corto o abreviación según el espacio
+            let displayText = node.project.title;
+            if (displayText.length > 10) {
+                displayText = displayText.split(' ')[0];
+                if (displayText.length > 10) {
+                    displayText = displayText.substring(0, 8) + '...';
+                }
+            }
+            
+            this.ctx.fillText(displayText, node.x, node.y);
         }
+    }
+    
+    // Función auxiliar para dibujar rectángulos redondeados
+    roundRect(ctx, x, y, width, height, radius) {
+        if (width < 2 * radius) radius = width / 2;
+        if (height < 2 * radius) radius = height / 2;
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + width, y, x + width, y + height, radius);
+        ctx.arcTo(x + width, y + height, x, y + height, radius);
+        ctx.arcTo(x, y + height, x, y, radius);
+        ctx.arcTo(x, y, x + width, y, radius);
+        ctx.closePath();
+        return ctx;
     }
     
     animate() {
