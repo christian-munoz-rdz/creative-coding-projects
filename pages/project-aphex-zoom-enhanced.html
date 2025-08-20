@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aphex Twin - Zoom Infinito</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .zoom-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s ease;
+        }
+
+        .logo-layer {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            opacity: 0;
+            animation: zoomInfinite 4s linear infinite;
+        }
+
+        .logo-layer svg {
+            width: 100%;
+            height: 100%;
+            fill: #00ff00;
+            filter: drop-shadow(0 0 10px #00ff00);
+        }
+
+        .logo-layer:nth-child(1) { animation-delay: 0s; }
+        .logo-layer:nth-child(2) { animation-delay: -0.4s; }
+        .logo-layer:nth-child(3) { animation-delay: -0.8s; }
+        .logo-layer:nth-child(4) { animation-delay: -1.2s; }
+        .logo-layer:nth-child(5) { animation-delay: -1.6s; }
+        .logo-layer:nth-child(6) { animation-delay: -2.0s; }
+        .logo-layer:nth-child(7) { animation-delay: -2.4s; }
+        .logo-layer:nth-child(8) { animation-delay: -2.8s; }
+        .logo-layer:nth-child(9) { animation-delay: -3.2s; }
+        .logo-layer:nth-child(10) { animation-delay: -3.6s; }
+
+        @keyframes zoomInfinite {
+            0% {
+                transform: scale(0.1) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.9;
+            }
+            90% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(12) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .background-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at center, transparent 2px, rgba(0,255,0,0.1) 3px),
+                linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px),
+                linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 10px 20px;
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .control-btn:hover {
+            background: rgba(0, 255, 0, 0.4);
+            box-shadow: 0 0 10px #00ff00;
+            transform: translateY(-2px);
+        }
+
+        .control-btn.active {
+            background: rgba(0, 255, 0, 0.6);
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        .info {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 14px;
+            text-shadow: 0 0 10px #00ff00;
+            line-height: 1.6;
+            z-index: 100;
+        }
+
+        .info div {
+            margin-bottom: 5px;
+        }
+
+        .stats {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+            text-shadow: 0 0 10px #00ff00;
+            z-index: 100;
+        }
+
+        .paused .logo-layer {
+            animation-play-state: paused;
+        }
+
+        .paused .background-grid {
+            animation-play-state: paused;
+        }
+
+        /* Efectos adicionales */
+        .glitch {
+            animation: glitch 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glitch {
+            0% { transform: skew(-2deg); }
+            50% { transform: skew(2deg); }
+            100% { transform: skew(-1deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .controls {
+                bottom: 10px;
+                gap: 5px;
+            }
+            
+            .control-btn {
+                padding: 8px 12px;
+                font-size: 10px;
+            }
+            
+            .info {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-grid"></div>
+    
+    <div class="info">
+        <div>APHEX TWIN - ZOOM INFINITO</div>
+        <div>ESPACIO: Pausar/Reanudar</div>
+        <div>A: Audio reactivo</div>
+        <div>1,2,3: Velocidades</div>
+        <div>G: Efecto glitch</div>
+    </div>
+
+    <div class="stats" id="stats">
+        <div>Capas activas: <span id="layerCount">10</span></div>
+        <div>Velocidad: <span id="currentSpeed">Normal</span></div>
+        <div>Estado: <span id="status">Reproduciendo</span></div>
+    </div>
+
+    <div class="zoom-container" id="zoomContainer">
+        <!-- Los logos se generarán dinámicamente -->
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" onclick="togglePause()" id="pauseBtn">PAUSAR</button>
+        <button class="control-btn" onclick="changeSpeed('slow')" id="slowBtn">LENTO</button>
+        <button class="control-btn active" onclick="changeSpeed('normal')" id="normalBtn">NORMAL</button>
+        <button class="control-btn" onclick="changeSpeed('fast')" id="fastBtn">RÁPIDO</button>
+        <button class="control-btn" onclick="addMoreLayers()" id="layersBtn">+ CAPAS</button>
+        <button class="control-btn" onclick="toggleAudio()" id="audioBtn">AUDIO</button>
+        <button class="control-btn" onclick="toggleGlitch()" id="glitchBtn">GLITCH</button>
+    </div>
+
+    <script src="../scripts/aphex-zoom.js"></script>
+    <script>
+        // Variables globales para el estado
+        let currentSpeedSetting = 'normal';
+        let isPaused = false;
+        let glitchMode = false;
+        let audioMode = false;
+
+        // Inicializar el controlador de animación
+        const aphexController = new AphexZoomController();
+        
+        // Funciones globales para los botones
+        function togglePause() {
+            isPaused = !isPaused;
+            aphexController.togglePause();
+            
+            const pauseBtn = document.getElementById('pauseBtn');
+            const status = document.getElementById('status');
+            
+            if (isPaused) {
+                pauseBtn.textContent = 'REANUDAR';
+                pauseBtn.classList.add('active');
+                status.textContent = 'Pausado';
+            } else {
+                pauseBtn.textContent = 'PAUSAR';
+                pauseBtn.classList.remove('active');
+                status.textContent = 'Reproduciendo';
+            }
+        }
+        
+        function changeSpeed(speed) {
+            currentSpeedSetting = speed;
+            aphexController.changeSpeed(speed);
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.control-btn').forEach(btn => {
+                if (btn.id.includes(speed) || btn.id === `${speed}Btn`) {
+                    btn.classList.add('active');
+                } else if (btn.id.includes('slow') || btn.id.includes('normal') || btn.id.includes('fast')) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Actualizar stats
+            const speedDisplay = speed.charAt(0).toUpperCase() + speed.slice(1);
+            document.getElementById('currentSpeed').textContent = speedDisplay;
+        }
+        
+        function addMoreLayers() {
+            const currentCount = parseInt(document.getElementById('layerCount').textContent);
+            aphexController.addRandomLayers(5);
+            document.getElementById('layerCount').textContent = currentCount + 5;
+            
+            // Efecto visual en el botón
+            const btn = document.getElementById('layersBtn');
+            btn.classList.add('active');
+            setTimeout(() => btn.classList.remove('active'), 500);
+        }
+        
+        function toggleAudio() {
+            audioMode = !audioMode;
+            aphexController.toggleAudio();
+            
+            const audioBtn = document.getElementById('audioBtn');
+            if (audioMode) {
+                audioBtn.classList.add('active');
+                audioBtn.textContent = 'AUDIO ON';
+            } else {
+                audioBtn.classList.remove('active');
+                audioBtn.textContent = 'AUDIO';
+            }
+        }
+        
+        function toggleGlitch() {
+            glitchMode = !glitchMode;
+            const container = document.getElementById('zoomContainer');
+            const glitchBtn = document.getElementById('glitchBtn');
+            
+            if (glitchMode) {
+                container.classList.add('glitch');
+                glitchBtn.classList.add('active');
+                glitchBtn.textContent = 'GLITCH ON';
+            } else {
+                container.classList.remove('glitch');
+                glitchBtn.classList.remove('active');
+                glitchBtn.textContent = 'GLITCH';
+            }
+        }
+        
+        // Función para efectos especiales aleatorios
+        function randomEffect() {
+            const container = document.getElementById('zoomContainer');
+            const effects = [
+                () => container.style.filter = 'hue-rotate(180deg)',
+                () => container.style.filter = 'invert(1)',
+                () => container.style.filter = 'saturate(3)',
+                () => container.style.transform += ' rotate(5deg)',
+                () => container.style.filter = 'none'
+            ];
+            
+            const randomIndex = Math.floor(Math.random() * effects.length);
+            effects[randomIndex]();
+            
+            setTimeout(() => {
+                container.style.filter = 'none';
+                container.style.transform = container.style.transform.replace(' rotate(5deg)', '');
+            }, 1000);
+        }
+        
+        // Inicializar cuando se carga la página
+        document.addEventListener('DOMContentLoaded', () => {
+            aphexController.init('zoomContainer');
+            
+            // Efectos aleatorios cada 10 segundos
+            setInterval(randomEffect, 10000);
+            
+            // Mostrar mensaje de bienvenida
+            setTimeout(() => {
+                console.log('🎵 APHEX TWIN ZOOM INFINITO 🎵');
+                console.log('Controles disponibles:');
+                console.log('- ESPACIO: Pausar/Reanudar');
+                console.log('- 1,2,3: Cambiar velocidad');
+                console.log('- A: Audio reactivo');
+                console.log('- G: Modo glitch');
+                console.log('- Botones en pantalla para más opciones');
+            }, 1000);
+        });
+        
+        // Controles adicionales con teclado
+        document.addEventListener('keydown', (e) => {
+            switch(e.key.toLowerCase()) {
+                case 'g':
+                    toggleGlitch();
+                    break;
+                case 'l':
+                    addMoreLayers();
+                    break;
+                case 'r':
+                    randomEffect();
+                    break;
+                case 'c':
+                    // Limpiar todas las capas adicionales
+                    const layers = document.querySelectorAll('.logo-layer');
+                    if (layers.length > 10) {
+                        for (let i = 10; i < layers.length; i++) {
+                            layers[i].remove();
+                        }
+                        document.getElementById('layerCount').textContent = '10';
+                    }
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

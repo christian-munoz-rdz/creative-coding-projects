@@ -1,0 +1,384 @@
+/* Aphex Twin Infinite Zoom Animation Styles */
+
+:root {
+    --primary-color: #00ff00;
+    --bg-color: #0a0a0a;
+    --grid-opacity: 0.1;
+    --glow-intensity: 15px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-color);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: 'Courier New', monospace;
+}
+
+/* Contenedor principal */
+.zoom-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.1s ease;
+    perspective: 1000px;
+}
+
+/* Capas de logos */
+.logo-layer {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+    animation: zoomInfinite 4s linear infinite;
+    transform-style: preserve-3d;
+}
+
+.logo-layer svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--primary-color);
+    filter: drop-shadow(0 0 var(--glow-intensity) currentColor);
+    transition: fill 0.3s ease;
+}
+
+/* Delays para las capas */
+.logo-layer:nth-child(1) { animation-delay: 0s; }
+.logo-layer:nth-child(2) { animation-delay: -0.4s; }
+.logo-layer:nth-child(3) { animation-delay: -0.8s; }
+.logo-layer:nth-child(4) { animation-delay: -1.2s; }
+.logo-layer:nth-child(5) { animation-delay: -1.6s; }
+.logo-layer:nth-child(6) { animation-delay: -2.0s; }
+.logo-layer:nth-child(7) { animation-delay: -2.4s; }
+.logo-layer:nth-child(8) { animation-delay: -2.8s; }
+.logo-layer:nth-child(9) { animation-delay: -3.2s; }
+.logo-layer:nth-child(10) { animation-delay: -3.6s; }
+
+/* Animación principal de zoom infinito */
+@keyframes zoomInfinite {
+    0% {
+        transform: scale(0.05) rotate(0deg) translateZ(0);
+        opacity: 0;
+    }
+    5% {
+        opacity: 0.2;
+    }
+    15% {
+        opacity: 0.9;
+    }
+    85% {
+        opacity: 0.9;
+    }
+    95% {
+        opacity: 0.2;
+    }
+    100% {
+        transform: scale(15) rotate(360deg) translateZ(100px);
+        opacity: 0;
+    }
+}
+
+/* Grid de fondo */
+.background-grid {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: calc(100% + 100px);
+    height: calc(100% + 100px);
+    background: 
+        radial-gradient(circle at 25% 25%, transparent 2px, rgba(0,255,0,var(--grid-opacity)) 3px),
+        radial-gradient(circle at 75% 75%, transparent 2px, rgba(0,255,0,var(--grid-opacity)) 3px),
+        linear-gradient(90deg, rgba(0,255,0,calc(var(--grid-opacity) * 0.5)) 1px, transparent 1px),
+        linear-gradient(rgba(0,255,0,calc(var(--grid-opacity) * 0.5)) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 50px 50px, 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: -1;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(50px, 50px) rotate(2deg); }
+}
+
+/* Controles */
+.controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.control-btn {
+    padding: 12px 18px;
+    background: linear-gradient(45deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 0, 0.3));
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    cursor: pointer;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.control-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.control-btn:hover {
+    background: linear-gradient(45deg, rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0.5));
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    transform: translateY(-3px) scale(1.05);
+}
+
+.control-btn:hover::before {
+    left: 100%;
+}
+
+.control-btn.active {
+    background: linear-gradient(45deg, rgba(0, 255, 0, 0.6), rgba(0, 255, 0, 0.8));
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.7);
+    animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 25px rgba(0, 255, 0, 0.7); }
+    100% { box-shadow: 0 0 35px rgba(0, 255, 0, 1); }
+}
+
+.control-btn:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Panel de información */
+.info {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    color: var(--primary-color);
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    text-shadow: 0 0 10px var(--primary-color);
+    line-height: 1.8;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.info div {
+    margin-bottom: 5px;
+}
+
+.info div:first-child {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    animation: flicker 2s ease-in-out infinite alternate;
+}
+
+@keyframes flicker {
+    0% { opacity: 1; }
+    50% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Panel de estadísticas */
+.stats {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: var(--primary-color);
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    text-shadow: 0 0 10px var(--primary-color);
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    backdrop-filter: blur(5px);
+    text-align: right;
+}
+
+.stats div {
+    margin-bottom: 8px;
+}
+
+/* Estados */
+.paused .logo-layer {
+    animation-play-state: paused;
+}
+
+.paused .background-grid {
+    animation-play-state: paused;
+}
+
+/* Efectos especiales */
+.glitch {
+    animation: glitch 0.3s ease-in-out infinite;
+}
+
+@keyframes glitch {
+    0% { 
+        transform: skew(-2deg) translateX(-2px);
+        filter: hue-rotate(0deg);
+    }
+    25% { 
+        transform: skew(1deg) translateX(1px);
+        filter: hue-rotate(90deg);
+    }
+    50% { 
+        transform: skew(-1deg) translateX(-1px);
+        filter: hue-rotate(180deg);
+    }
+    75% { 
+        transform: skew(2deg) translateX(2px);
+        filter: hue-rotate(270deg);
+    }
+    100% { 
+        transform: skew(-1deg) translateX(-1px);
+        filter: hue-rotate(360deg);
+    }
+}
+
+.audio-reactive {
+    animation: audioReact 0.1s ease-in-out infinite;
+}
+
+@keyframes audioReact {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+/* Efectos de partículas */
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFloat 3s linear infinite;
+}
+
+@keyframes particleFloat {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100px) scale(0.5);
+    }
+}
+
+/* Temas alternativos */
+.theme-blue {
+    --primary-color: #00aaff;
+    --grid-opacity: 0.15;
+}
+
+.theme-red {
+    --primary-color: #ff0040;
+    --grid-opacity: 0.12;
+}
+
+.theme-purple {
+    --primary-color: #aa00ff;
+    --grid-opacity: 0.18;
+}
+
+.theme-rainbow .logo-layer svg {
+    animation: rainbow 3s linear infinite;
+}
+
+@keyframes rainbow {
+    0% { filter: hue-rotate(0deg) drop-shadow(0 0 var(--glow-intensity) currentColor); }
+    100% { filter: hue-rotate(360deg) drop-shadow(0 0 var(--glow-intensity) currentColor); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .controls {
+        bottom: 10px;
+        gap: 5px;
+        padding: 8px;
+    }
+    
+    .control-btn {
+        padding: 8px 12px;
+        font-size: 9px;
+    }
+    
+    .info, .stats {
+        font-size: 11px;
+        padding: 10px;
+    }
+    
+    .info div:first-child {
+        font-size: 14px;
+    }
+    
+    .logo-layer {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .info {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        text-align: center;
+    }
+    
+    .stats {
+        top: auto;
+        bottom: 80px;
+        right: 10px;
+        left: 10px;
+        text-align: center;
+    }
+    
+    .logo-layer {
+        width: 120px;
+        height: 120px;
+    }
+}

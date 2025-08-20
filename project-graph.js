@@ -493,7 +493,8 @@ class ProjectGraph {
             'Generador de Átomos': 'Generador',
             'Efecto Píxel': 'Efecto',
             'Efecto Rama': 'Efecto',
-            'Triángulo de Sierpinski': 'Triángulo'
+            'Triángulo de Sierpinski': 'Triángulo',
+            'Aphex Zoom Infinito': 'Aphex'
         };
         
         return nameMap[fullTitle] || fullTitle.split(' ')[0];
@@ -604,6 +605,12 @@ document.addEventListener('DOMContentLoaded', () => {
             description: 'Visualización fractal del triángulo de Sierpinski',
             url: 'pages/project-sierpinski-triangle.html',
             jsFile: 'scripts/sierpinski-triangle.js'
+        },
+        {
+            title: 'Aphex Zoom Infinito',
+            description: 'Animación hipnótica de zoom infinito con el logo de Aphex Twin',
+            url: 'pages/project-aphex-zoom-enhanced.html',
+            jsFile: 'scripts/aphex-zoom.js'
         }
     ];
     
