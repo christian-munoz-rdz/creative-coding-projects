@@ -1,10 +1,10 @@
 /* Aphex Twin Infinite Zoom Animation Styles */
 
 :root {
-    --primary-color: #00ff00;
-    --bg-color: #0a0a0a;
-    --grid-opacity: 0.1;
-    --glow-intensity: 15px;
+    --primary-color: #ffffff;
+    --bg-color: #000000;
+    --grid-opacity: 0.05;
+    --glow-intensity: 10px;
 }
 
 * {
@@ -65,31 +65,31 @@ body {
 .logo-layer:nth-child(9) { animation-delay: -3.2s; }
 .logo-layer:nth-child(10) { animation-delay: -3.6s; }
 
-/* Animación principal de zoom infinito */
+/* Animación principal de zoom infinito - SIN ROTACIÓN */
 @keyframes zoomInfinite {
     0% {
-        transform: scale(0.05) rotate(0deg) translateZ(0);
+        transform: scale(0.02);
         opacity: 0;
     }
     5% {
-        opacity: 0.2;
+        opacity: 0.1;
     }
     15% {
-        opacity: 0.9;
+        opacity: 0.8;
     }
     85% {
-        opacity: 0.9;
+        opacity: 0.8;
     }
     95% {
-        opacity: 0.2;
+        opacity: 0.1;
     }
     100% {
-        transform: scale(15) rotate(360deg) translateZ(100px);
+        transform: scale(20);
         opacity: 0;
     }
 }
 
-/* Grid de fondo */
+/* Grid de fondo - minimalista en blanco y negro */
 .background-grid {
     position: absolute;
     top: -50px;
@@ -97,18 +97,18 @@ body {
     width: calc(100% + 100px);
     height: calc(100% + 100px);
     background: 
-        radial-gradient(circle at 25% 25%, transparent 2px, rgba(0,255,0,var(--grid-opacity)) 3px),
-        radial-gradient(circle at 75% 75%, transparent 2px, rgba(0,255,0,var(--grid-opacity)) 3px),
-        linear-gradient(90deg, rgba(0,255,0,calc(var(--grid-opacity) * 0.5)) 1px, transparent 1px),
-        linear-gradient(rgba(0,255,0,calc(var(--grid-opacity) * 0.5)) 1px, transparent 1px);
+        radial-gradient(circle at 25% 25%, transparent 1px, rgba(255,255,255,var(--grid-opacity)) 2px),
+        radial-gradient(circle at 75% 75%, transparent 1px, rgba(255,255,255,var(--grid-opacity)) 2px),
+        linear-gradient(90deg, rgba(255,255,255,calc(var(--grid-opacity) * 0.3)) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,calc(var(--grid-opacity) * 0.3)) 1px, transparent 1px);
     background-size: 100px 100px, 100px 100px, 50px 50px, 50px 50px;
-    animation: gridMove 20s linear infinite;
+    animation: gridMove 30s linear infinite;
     z-index: -1;
 }
 
 @keyframes gridMove {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    100% { transform: translate(50px, 50px) rotate(2deg); }
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
 }
 
 /* Controles */
@@ -123,21 +123,22 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Controles - estilo minimalista blanco y negro */
 .control-btn {
     padding: 12px 18px;
-    background: linear-gradient(45deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 0, 0.3));
-    border: 2px solid var(--primary-color);
-    color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 3px;
     font-family: 'Courier New', monospace;
     font-size: 11px;
-    font-weight: bold;
+    font-weight: normal;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -152,14 +153,14 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 0.5s;
 }
 
 .control-btn:hover {
-    background: linear-gradient(45deg, rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0.5));
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-    transform: translateY(-3px) scale(1.05);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
 }
 
 .control-btn:hover::before {
@@ -167,9 +168,8 @@ body {
 }
 
 .control-btn.active {
-    background: linear-gradient(45deg, rgba(0, 255, 0, 0.6), rgba(0, 255, 0, 0.8));
-    box-shadow: 0 0 25px rgba(0, 255, 0, 0.7);
-    animation: pulse 1s ease-in-out infinite alternate;
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.8);
 }
 
 @keyframes pulse {
@@ -181,22 +181,20 @@ body {
     transform: translateY(-1px) scale(0.98);
 }
 
-/* Panel de información */
+/* Panel de información - minimalista */
 .info {
     position: fixed;
     top: 20px;
     left: 20px;
-    color: var(--primary-color);
+    color: #ffffff;
     font-family: 'Courier New', monospace;
     font-size: 13px;
-    text-shadow: 0 0 10px var(--primary-color);
     line-height: 1.8;
     z-index: 100;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     padding: 15px;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 255, 0, 0.3);
-    backdrop-filter: blur(5px);
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .info div {
@@ -208,30 +206,21 @@ body {
     font-weight: bold;
     margin-bottom: 10px;
     text-align: center;
-    animation: flicker 2s ease-in-out infinite alternate;
 }
 
-@keyframes flicker {
-    0% { opacity: 1; }
-    50% { opacity: 0.8; }
-    100% { opacity: 1; }
-}
-
-/* Panel de estadísticas */
+/* Panel de estadísticas - minimalista */
 .stats {
     position: fixed;
     top: 20px;
     right: 20px;
-    color: var(--primary-color);
+    color: #ffffff;
     font-family: 'Courier New', monospace;
     font-size: 12px;
-    text-shadow: 0 0 10px var(--primary-color);
     z-index: 100;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     padding: 15px;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 255, 0, 0.3);
-    backdrop-filter: blur(5px);
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     text-align: right;
 }
 

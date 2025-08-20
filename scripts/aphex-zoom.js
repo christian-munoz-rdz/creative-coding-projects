@@ -23,8 +23,8 @@ class AphexZoomController {
         </svg>`;
         
         this.colors = [
-            '#ff0040', '#00ff40', '#4000ff', '#ff4000', '#40ff00',
-            '#0040ff', '#ff0080', '#80ff00', '#0080ff', '#ff8000'
+            '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff',
+            '#ffffff', '#ffffff', '#ffffff', '#ffffff', '#ffffff'
         ];
     }
 
@@ -46,10 +46,9 @@ class AphexZoomController {
             logoLayer.className = 'logo-layer';
             logoLayer.innerHTML = this.svgContent;
             
-            // Aplicar color específico
+            // Aplicar solo color blanco
             const svg = logoLayer.querySelector('svg');
-            svg.style.fill = this.colors[i];
-            svg.style.filter = `drop-shadow(0 0 15px ${this.colors[i]})`;
+            svg.style.fill = '#ffffff';
             
             this.container.appendChild(logoLayer);
             this.layers.push(logoLayer);
@@ -164,17 +163,10 @@ class AphexZoomController {
         const average = this.dataArray.reduce((a, b) => a + b) / this.dataArray.length;
         const intensity = average / 255;
         
-        // Aplicar efectos basados en audio
-        const hueRotation = intensity * 360;
-        const saturation = 1 + intensity;
-        const scale = 1 + intensity * 0.3;
-        
-        this.container.style.filter = `hue-rotate(${hueRotation}deg) saturate(${saturation})`;
-        
-        // Modular la velocidad de animación según el audio
-        const speedMultiplier = 1 + intensity;
+        // Solo aplicar cambios en la velocidad de la animación basado en audio
+        const speedMultiplier = 1 + intensity * 0.5;
         this.layers.forEach((layer, index) => {
-            const baseDelay = -0.4 * index;
+            const baseDelay = -0.6 * index;
             const audioDelay = intensity * 0.1;
             layer.style.animationDelay = `${baseDelay + audioDelay}s`;
         });
@@ -188,15 +180,13 @@ class AphexZoomController {
             logoLayer.className = 'logo-layer';
             logoLayer.innerHTML = this.svgContent;
             
-            // Color aleatorio
-            const randomColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+            // Solo color blanco
             const svg = logoLayer.querySelector('svg');
-            svg.style.fill = randomColor;
-            svg.style.filter = `drop-shadow(0 0 15px ${randomColor})`;
+            svg.style.fill = '#ffffff';
             
-            // Animación aleatoria
-            logoLayer.style.animationDelay = `${Math.random() * -4}s`;
-            logoLayer.style.animationDuration = `${3 + Math.random() * 4}s`;
+            // Animación con delay aleatorio
+            logoLayer.style.animationDelay = `${Math.random() * -6}s`;
+            logoLayer.style.animationDuration = `${4 + Math.random() * 4}s`;
             
             this.container.appendChild(logoLayer);
             this.layers.push(logoLayer);
@@ -210,37 +200,18 @@ class AphexZoomController {
                         this.layers.splice(index, 1);
                     }
                 }
-            }, 10000);
+            }, 15000);
         }
     }
 
     cycleThroughEffects() {
-        const effects = ['normal', 'invert', 'sepia', 'grayscale', 'blur'];
+        const effects = ['normal'];
         let currentEffect = 0;
         
         setInterval(() => {
-            const effect = effects[currentEffect];
-            let filterValue = '';
-            
-            switch(effect) {
-                case 'invert':
-                    filterValue = 'invert(1)';
-                    break;
-                case 'sepia':
-                    filterValue = 'sepia(1)';
-                    break;
-                case 'grayscale':
-                    filterValue = 'grayscale(1)';
-                    break;
-                case 'blur':
-                    filterValue = 'blur(2px)';
-                    break;
-                default:
-                    filterValue = 'none';
-            }
-            
-            document.body.style.filter = filterValue;
-            currentEffect = (currentEffect + 1) % effects.length;
+            // Solo mantener el efecto normal - sin cambios de color
+            document.body.style.filter = 'none';
+            currentEffect = 0;
         }, 5000);
     }
 }
