@@ -33,10 +33,10 @@
 
         .logo-layer {
             position: absolute;
-            width: 200px;
-            height: 200px;
+            width: 150px;
+            height: 150px;
             opacity: 0;
-            animation: zoomInfinite 6s linear infinite;
+            animation: zoomInfinite 8s linear infinite;
         }
 
         .logo-layer svg {
@@ -46,29 +46,25 @@
         }
 
         .logo-layer:nth-child(1) { animation-delay: 0s; }
-        .logo-layer:nth-child(2) { animation-delay: -0.6s; }
-        .logo-layer:nth-child(3) { animation-delay: -1.2s; }
-        .logo-layer:nth-child(4) { animation-delay: -1.8s; }
-        .logo-layer:nth-child(5) { animation-delay: -2.4s; }
-        .logo-layer:nth-child(6) { animation-delay: -3.0s; }
-        .logo-layer:nth-child(7) { animation-delay: -3.6s; }
-        .logo-layer:nth-child(8) { animation-delay: -4.2s; }
-        .logo-layer:nth-child(9) { animation-delay: -4.8s; }
-        .logo-layer:nth-child(10) { animation-delay: -5.4s; }
+        .logo-layer:nth-child(2) { animation-delay: -1.3s; }
+        .logo-layer:nth-child(3) { animation-delay: -2.6s; }
+        .logo-layer:nth-child(4) { animation-delay: -3.9s; }
+        .logo-layer:nth-child(5) { animation-delay: -5.2s; }
+        .logo-layer:nth-child(6) { animation-delay: -6.5s; }
 
         @keyframes zoomInfinite {
             0% {
-                transform: scale(0.01);
+                transform: scale(0.05);
                 opacity: 0;
             }
-            10% {
-                opacity: 0.8;
+            15% {
+                opacity: 0.9;
             }
-            90% {
-                opacity: 0.8;
+            85% {
+                opacity: 0.9;
             }
             100% {
-                transform: scale(25);
+                transform: scale(8);
                 opacity: 0;
             }
         }
@@ -230,7 +226,7 @@
     </div>
 
     <div class="stats" id="stats">
-        <div>Capas activas: <span id="layerCount">10</span></div>
+        <div>Capas activas: <span id="layerCount">6</span></div>
         <div>Velocidad: <span id="currentSpeed">Normal</span></div>
         <div>Estado: <span id="status">Reproduciendo</span></div>
     </div>
@@ -299,8 +295,8 @@
         
         function addMoreLayers() {
             const currentCount = parseInt(document.getElementById('layerCount').textContent);
-            aphexController.addRandomLayers(5);
-            document.getElementById('layerCount').textContent = currentCount + 5;
+            aphexController.addRandomLayers(3); // Reducido a 3 capas por vez
+            document.getElementById('layerCount').textContent = currentCount + 3;
             
             // Efecto visual en el botón
             const btn = document.getElementById('layersBtn');
@@ -392,11 +388,11 @@
                 case 'c':
                     // Limpiar todas las capas adicionales
                     const layers = document.querySelectorAll('.logo-layer');
-                    if (layers.length > 10) {
-                        for (let i = 10; i < layers.length; i++) {
+                    if (layers.length > 6) {
+                        for (let i = 6; i < layers.length; i++) {
                             layers[i].remove();
                         }
-                        document.getElementById('layerCount').textContent = '10';
+                        document.getElementById('layerCount').textContent = '6';
                     }
                     break;
             }

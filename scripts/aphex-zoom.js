@@ -35,12 +35,12 @@ class AphexZoomController {
             return;
         }
 
-        this.createLogoLayers();
+        this.createLogoLayers(6); // Reducido a 6 capas para evitar sobreposición
         this.setupEventListeners();
         this.startMouseTracking();
     }
 
-    createLogoLayers(count = 10) {
+    createLogoLayers(count = 6) {
         for (let i = 0; i < count; i++) {
             const logoLayer = document.createElement('div');
             logoLayer.className = 'logo-layer';
@@ -49,6 +49,9 @@ class AphexZoomController {
             // Aplicar solo color blanco
             const svg = logoLayer.querySelector('svg');
             svg.style.fill = '#ffffff';
+            
+            // Espaciar más los delays para evitar sobreposición
+            logoLayer.style.animationDelay = `${-i * 1.3}s`;
             
             this.container.appendChild(logoLayer);
             this.layers.push(logoLayer);
@@ -174,7 +177,7 @@ class AphexZoomController {
         requestAnimationFrame(() => this.animateWithAudio());
     }
 
-    addRandomLayers(count = 5) {
+    addRandomLayers(count = 3) {
         for (let i = 0; i < count; i++) {
             const logoLayer = document.createElement('div');
             logoLayer.className = 'logo-layer';
@@ -184,9 +187,9 @@ class AphexZoomController {
             const svg = logoLayer.querySelector('svg');
             svg.style.fill = '#ffffff';
             
-            // Animación con delay aleatorio
-            logoLayer.style.animationDelay = `${Math.random() * -6}s`;
-            logoLayer.style.animationDuration = `${4 + Math.random() * 4}s`;
+            // Animación con delay aleatorio más espaciado
+            logoLayer.style.animationDelay = `${Math.random() * -8}s`;
+            logoLayer.style.animationDuration = `${6 + Math.random() * 4}s`;
             
             this.container.appendChild(logoLayer);
             this.layers.push(logoLayer);
@@ -200,7 +203,7 @@ class AphexZoomController {
                         this.layers.splice(index, 1);
                     }
                 }
-            }, 15000);
+            }, 20000);
         }
     }
 
