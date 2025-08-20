@@ -129,17 +129,50 @@ class AphexZoomController {
             try {
                 await this.initAudio();
                 this.audioEnabled = true;
-                console.log('Audio habilitado');
+                this.container.classList.add('audio-reactive');
+                
+                // Mostrar niveles de audio
+                const audioLevels = document.getElementById('audioLevels');
+                if (audioLevels) audioLevels.style.display = 'block';
+                
+                console.log('Audio habilitado - El logo se deformará con el sonido');
             } catch (error) {
                 console.error('Error al habilitar audio:', error);
             }
         } else {
             this.audioEnabled = false;
+            this.container.classList.remove('audio-reactive');
+            
+            // Ocultar niveles de audio
+            const audioLevels = document.getElementById('audioLevels');
+            if (audioLevels) audioLevels.style.display = 'none';
+            
             if (this.audioContext) {
                 this.audioContext.close();
             }
+            // Resetear transformaciones
+            this.resetAudioEffects();
             console.log('Audio deshabilitado');
         }
+    }
+
+    resetAudioEffects() {
+        this.layers.forEach(layer => {
+            const svg = layer.querySelector('svg');
+            if (svg) {
+                svg.style.transform = '';
+                svg.style.opacity = '';
+                svg.style.filter = '';
+                
+                const paths = svg.querySelectorAll('path');
+                paths.forEach(path => {
+                    path.style.transform = '';
+                    path.style.strokeWidth = '';
+                    path.style.stroke = '';
+                    path.style.fill = '#ffffff';
+                });
+            }
+        });
     }
 
     async initAudio() {
@@ -150,8 +183,10 @@ class AphexZoomController {
             const source = this.audioContext.createMediaStreamSource(stream);
             source.connect(this.analyser);
             
-            this.analyser.fftSize = 256;
+            this.analyser.fftSize = 512; // Aumentado para mejor análisis
+            this.analyser.smoothingTimeConstant = 0.8;
             this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+            this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
             
             this.animateWithAudio();
         } catch (error) {
@@ -163,18 +198,157 @@ class AphexZoomController {
         if (!this.audioEnabled || !this.analyser || !this.dataArray) return;
         
         this.analyser.getByteFrequencyData(this.dataArray);
-        const average = this.dataArray.reduce((a, b) => a + b) / this.dataArray.length;
-        const intensity = average / 255;
+        this.analyser.getByteTimeDomainData(this.freqData);
         
-        // Solo aplicar cambios en la velocidad de la animación basado en audio
-        const speedMultiplier = 1 + intensity * 0.5;
+        // Análisis de diferentes rangos de frecuencia
+        const bassRange = this.getAverageVolume(0, 60); // Bajos
+        const midRange = this.getAverageVolume(60, 170); // Medios
+        const highRange = this.getAverageVolume(170, 255); // Agudos
+        const overall = this.getAverageVolume(0, 255); // General
+        
+        const bassIntensity = bassRange / 255;
+        const midIntensity = midRange / 255;
+        const highIntensity = highRange / 255;
+        const overallIntensity = overall / 255;
+        
+        // Actualizar UI de niveles de audio
+        this.updateAudioLevels(bassIntensity, midIntensity, highIntensity);
+        
+        // Aplicar deformaciones a cada logo
         this.layers.forEach((layer, index) => {
-            const baseDelay = -0.6 * index;
-            const audioDelay = intensity * 0.1;
-            layer.style.animationDelay = `${baseDelay + audioDelay}s`;
+            const svg = layer.querySelector('svg');
+            if (svg) {
+                this.applyAudioDeformation(svg, {
+                    bass: bassIntensity,
+                    mid: midIntensity,
+                    high: highIntensity,
+                    overall: overallIntensity,
+                    index: index
+                });
+            }
+        });
+        
+        // Modular la velocidad de animación según el audio
+        const speedMultiplier = 1 + overallIntensity * 0.8;
+        this.layers.forEach((layer, index) => {
+            const baseDelay = -index * 1.3;
+            const audioDelay = overallIntensity * 0.2;
+            layer.style.animationDuration = `${8 / speedMultiplier}s`;
         });
         
         requestAnimationFrame(() => this.animateWithAudio());
+    }
+
+    updateAudioLevels(bass, mid, high) {
+        const bassElement = document.getElementById('bassLevel');
+        const midElement = document.getElementById('midLevel');
+        const highElement = document.getElementById('highLevel');
+        
+        if (bassElement) bassElement.textContent = `${Math.round(bass * 100)}%`;
+        if (midElement) midElement.textContent = `${Math.round(mid * 100)}%`;
+        if (highElement) highElement.textContent = `${Math.round(high * 100)}%`;
+    }
+
+    getAverageVolume(startIndex, endIndex) {
+        let sum = 0;
+        const count = endIndex - startIndex;
+        for (let i = startIndex; i < endIndex && i < this.dataArray.length; i++) {
+            sum += this.dataArray[i];
+        }
+        return sum / count;
+    }
+
+    applyAudioDeformation(svg, audioData) {
+        const { bass, mid, high, overall, index } = audioData;
+        
+        // Crear transformaciones dinámicas basadas en audio
+        let transform = '';
+        
+        // Deformación por bajos - escala vertical
+        const bassScale = 1 + bass * 0.4;
+        
+        // Deformación por medios - escala horizontal
+        const midScale = 1 + mid * 0.3;
+        
+        // Deformación por agudos - rotación sutil
+        const highRotation = high * 10;
+        
+        // Skew basado en intensidad general
+        const skewX = (overall - 0.5) * 15;
+        const skewY = (bass - 0.5) * 10;
+        
+        // Vibración en altas frecuencias
+        const vibrationX = high > 0.3 ? (Math.random() - 0.5) * high * 4 : 0;
+        const vibrationY = high > 0.3 ? (Math.random() - 0.5) * high * 4 : 0;
+        
+        // Aplicar todas las transformaciones
+        transform = `
+            scale(${midScale}, ${bassScale})
+            rotate(${highRotation}deg)
+            skew(${skewX}deg, ${skewY}deg)
+            translate(${vibrationX}px, ${vibrationY}px)
+        `;
+        
+        svg.style.transform = transform;
+        
+        // Cambiar opacidad basada en intensidad
+        const opacity = 0.7 + (overall * 0.3);
+        svg.style.opacity = opacity;
+        
+        // Aplicar filtros adicionales para efectos extremos
+        if (overall > 0.7) {
+            // Efecto de "glitch" en volúmenes altos
+            const glitchFilter = `
+                contrast(${1 + overall * 0.5})
+                blur(${overall > 0.9 ? (overall - 0.9) * 10 : 0}px)
+            `;
+            svg.style.filter = glitchFilter;
+        } else {
+            svg.style.filter = 'none';
+        }
+        
+        // Deformación especial para el logo de Aphex Twin
+        this.applyAphexDeformation(svg, audioData);
+    }
+
+    applyAphexDeformation(svg, audioData) {
+        const { bass, mid, high, overall } = audioData;
+        const paths = svg.querySelectorAll('path');
+        
+        paths.forEach((path, pathIndex) => {
+            // Aplicar transformaciones específicas a cada path del logo
+            let pathTransform = '';
+            
+            // Los bajos afectan más el path exterior (cara)
+            if (pathIndex === 1) { // Path del círculo exterior
+                const faceDeformation = 1 + bass * 0.2;
+                pathTransform += `scale(${faceDeformation}) `;
+            }
+            
+            // Los agudos afectan más los detalles internos
+            if (pathIndex === 0) { // Path de los detalles internos
+                const detailShake = high > 0.4 ? (Math.random() - 0.5) * high * 2 : 0;
+                pathTransform += `translate(${detailShake}px, ${detailShake}px) `;
+                
+                // Deformación de sonrisa
+                const smileStretch = 1 + mid * 0.3;
+                pathTransform += `scaleX(${smileStretch}) `;
+            }
+            
+            path.style.transform = pathTransform;
+            
+            // Variaciones de stroke-width basadas en audio
+            if (overall > 0.5) {
+                const strokeWidth = overall * 2;
+                path.style.strokeWidth = `${strokeWidth}px`;
+                path.style.stroke = '#ffffff';
+                path.style.fill = 'none';
+            } else {
+                path.style.strokeWidth = '0';
+                path.style.stroke = 'none';
+                path.style.fill = '#ffffff';
+            }
+        });
     }
 
     addRandomLayers(count = 3) {

@@ -220,7 +220,7 @@
     <div class="info">
         <div>APHEX TWIN - ZOOM INFINITO</div>
         <div>ESPACIO: Pausar/Reanudar</div>
-        <div>A: Audio reactivo</div>
+        <div>A: Audio reactivo <span id="audioStatus">(OFF)</span></div>
         <div>1,2,3: Velocidades</div>
         <div>G: Efecto glitch</div>
     </div>
@@ -229,6 +229,11 @@
         <div>Capas activas: <span id="layerCount">6</span></div>
         <div>Velocidad: <span id="currentSpeed">Normal</span></div>
         <div>Estado: <span id="status">Reproduciendo</span></div>
+        <div id="audioLevels" style="display: none;">
+            <div>🎵 Bajos: <span id="bassLevel">0%</span></div>
+            <div>🎵 Medios: <span id="midLevel">0%</span></div>
+            <div>🎵 Agudos: <span id="highLevel">0%</span></div>
+        </div>
     </div>
 
     <div class="zoom-container" id="zoomContainer">
@@ -309,12 +314,18 @@
             aphexController.toggleAudio();
             
             const audioBtn = document.getElementById('audioBtn');
+            const audioStatus = document.getElementById('audioStatus');
+            
             if (audioMode) {
                 audioBtn.classList.add('active');
                 audioBtn.textContent = 'AUDIO ON';
+                audioStatus.textContent = '(ON - DEFORMANDO)';
+                audioStatus.style.color = '#ff4444';
             } else {
                 audioBtn.classList.remove('active');
                 audioBtn.textContent = 'AUDIO';
+                audioStatus.textContent = '(OFF)';
+                audioStatus.style.color = '#ffffff';
             }
         }
         

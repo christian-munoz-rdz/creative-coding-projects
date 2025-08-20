@@ -49,7 +49,22 @@ body {
     width: 100%;
     height: 100%;
     fill: var(--primary-color);
-    transition: fill 0.3s ease;
+    transition: all 0.1s ease-out;
+    transform-origin: center center;
+}
+
+.logo-layer svg path {
+    transition: all 0.1s ease-out;
+    transform-origin: center center;
+}
+
+/* Efectos específicos para audio reactivo */
+.audio-reactive .logo-layer svg {
+    transition: all 0.05s ease-out;
+}
+
+.audio-reactive .logo-layer svg path {
+    transition: all 0.05s ease-out;
 }
 
 /* Delays para las capas - más espaciados */
